@@ -566,11 +566,12 @@ const ApprovedWithdrawals = () => {
           Amount: withdrawal.amount || 0,
           USDT_Amount: withdrawal.USDT_Amount || 0,
           Charge: withdrawal.charge || 0,
+          AfterCharge: withdrawal.After_Charge || 0,
           Token_Amount: withdrawal.Token_Amount || 0,
           Fee_Tokens: withdrawal.Fee_tokens || 0,
           Token: withdrawal.token || 0,
-          "Created At": withdrawal.createdAt ? new Date(withdrawal.createdAt).toLocaleString() : "N/A",
-          "Updated At": withdrawal.updatedAt ? new Date(withdrawal.updatedAt).toLocaleString() : "N/A",
+          "Created At": withdrawal.createdAt || "N/A",
+          "Updated At": withdrawal.updatedAt || "N/A",
           Status: withdrawal.status || "N/A",
         })),
       )
@@ -791,8 +792,8 @@ const ApprovedWithdrawals = () => {
                           <td>{withdrawal.Token_Amount || 0}</td>
                           <td>{withdrawal.Fee_tokens || 0}</td>
                           <td>{withdrawal.token || 0}</td>
-                          <td>{new Date(withdrawal.createdAt).toLocaleString() || "N/A"}</td>
-                          <td>{new Date(withdrawal.updatedAt).toLocaleString() || "N/A"}</td>
+                          <td>{withdrawal.createdAt|| "N/A"}</td>
+                          <td>{withdrawal.updatedAt || "N/A"}</td>
                           <td>
                             <span className="badge bg-success">Approved</span>
                           </td>

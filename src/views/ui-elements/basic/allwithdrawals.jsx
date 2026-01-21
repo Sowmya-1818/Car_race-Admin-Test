@@ -557,8 +557,8 @@ const AllWithdrawals = () => {
         UserName: withdrawal.username || "N/A",
         Amount: withdrawal.amount || 0,
         // USDT_Amount: withdrawal.USDT_Amount || 0,
-        "Created At": withdrawal.createdAt ? new Date(withdrawal.createdAt).toLocaleString() : "N/A",
-        "Updated At": withdrawal.updatedAt ? new Date(withdrawal.updatedAt).toLocaleString() : "N/A",
+        "Created At": withdrawal.createdAt || "N/A",
+        "Updated At": withdrawal.updatedAt || "N/A",
            Status: withdrawal.status || "N/A",
       }))
 
@@ -642,8 +642,8 @@ const AllWithdrawals = () => {
                         <td>{withdrawal.username || "N/A"}</td>
                         <td>{withdrawal.amount || 0}</td>
                         {/* <td>{withdrawal.USDT_Amount || 0}</td> */}
-                        <td>{new Date(withdrawal.createdAt).toLocaleString() || "N/A"}</td>
-                        <td>{new Date(withdrawal.updatedAt).toLocaleString() || "N/A"}</td>
+                        <td>{withdrawal.createdAt|| "N/A"}</td>
+                        <td>{withdrawal.updatedAt || "N/A"}</td>
                         <td>
                           <CBadge color={getStatusBadge(withdrawal.status)}>
                             {withdrawal.status?.charAt(0).toUpperCase() + withdrawal.status?.slice(1)}

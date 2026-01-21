@@ -3485,59 +3485,56 @@ const UserGameDetails = () => {
   };
 
   // Download Excel function
-const downloadPlayerExcel = async () => {
-  try {
-    setIsExporting(true);
+  const downloadPlayerExcel = async () => {
+    try {
+      setIsExporting(true);
 
-    // Fetch data
-    const allData = await fetchAllDataForExport();
+      // Fetch data
+      const allData = await fetchAllDataForExport();
 
-    // Check if there’s any data to export
-    if (!allData || allData.length === 0) {
-      alert("No data to export");
-      return;
-    }
+      // Check if there’s any data to export
+      if (!allData || allData.length === 0) {
+        alert("No data to export");
+        return;
+      }
 
-    let formattedData = [];
+      let formattedData = [];
 
-    // Format the data based on the selected history type
-    if (!historyType || historyType === "") {
-      // For "All Types"
-      formattedData = allData.map((item, index) => ({
-        SNo: index + 1,
-        Type: item.type || "N/A",
-        UserId: selectedUserId,
-        Date: item.timestamp ? new Date(item.timestamp).toLocaleString() : "N/A",
-        Description: getItemDescription(item),
-        Amount: getItemAmount(item),
-        Reward: getItemReward(item),
-        Balance: getItemBalance(item),
-        Status: getItemStatus(item),
-      }));
-    } else if (historyType === "gamehistory") {
-      formattedData = allData.map((item, index) => ({
-        SNo: index + 1,
-        UserName: item.username || "N/A",
-        GameTitle: item.gameTitle || "N/A",
-        CreatedAt: item.createdAt ? new Date(item.createdAt).toLocaleString() : "N/A",
-        UpdatedAt: item.updatedAt ? new Date(item.updatedAt).toLocaleString() : "N/A",
-        InitialBalance: item.initialbalance || 0,
-        BetAmount: item.betAmount || 0,
-        Prize: item.winAmount || 0,
-        FinalBalance: item.finalbalance || 0,
-        PlayedStatus: item.playedStatus || "N/A",
-      }));
-    } else if (historyType === "gamehistory") {
+      // Format the data based on the selected history type
+      if (!historyType || historyType === "") {
+        // For "All Types"
+        formattedData = allData.map((item, index) => ({
+          SNo: index + 1,
+          UserName: item.username || item.referringUser?.username || "N/A",
+          // Title: item.type || "N/A",
+          CreatedAt:
+            item.createdAt || item.CompletionTime || item.claimedAt || "N/A",
+          InitialBalance:
+            item.initialbalance ||
+            item.initialBalance ||
+            item.InitialBalance ||
+            0,
+          BetAmount: item.betAmount || 0,
+          Prize:
+            item.prize ||
+            item.winAmount ||
+            item.rewardPoints ||
+            item.Rewardpoints ||
+            item.referralamount ||
+            0,
+          FinalBalance:
+            item.finalbalance || item.finalBalance || item.FinalBalance || 0,
+          PlayedStatus:
+            item.playedstatus || item.playedStatus || item.status || "N/A",
+          HistoryType: item.type || "N/A",
+        }));
+      } else if (historyType === "gamehistory") {
         formattedData = allData.map((item, index) => ({
           SNo: index + 1,
           UserName: item.username || "N/A",
           GameTitle: item.gameTitle || "N/A",
-          CreatedAt: item.createdAt
-            ? new Date(item.createdAt).toLocaleString()
-            : "N/A",
-          UpdatedAt: item.updatedAt
-            ? new Date(item.updatedAt).toLocaleString()
-            : "N/A",
+          CreatedAt: item.createdAt || "N/A",
+          UpdatedAt: item.updatedAt || "N/A",
           InitialBalance: item.initialbalance || 0,
           BetAmount: item.betAmount || 0,
           Prize: item.winAmount || 0,
@@ -3548,9 +3545,7 @@ const downloadPlayerExcel = async () => {
         formattedData = allData.map((item, index) => ({
           SNo: index + 1,
           UserName: item.username || "N/A",
-          Initiated: item.CompletionTime
-            ? new Date(item.CompletionTime).toLocaleString()
-            : "N/A",
+          Initiated: item.CompletionTime || "N/A",
           InitialBalance: item.InitialBalance || 0,
           RewardAmount: item.Rewardpoints || 0,
           FinalBalance: item.FinalBalance || 0,
@@ -3560,9 +3555,7 @@ const downloadPlayerExcel = async () => {
         formattedData = allData.map((item, index) => ({
           SNo: index + 1,
           UserName: item.username || "N/A",
-          Initiated: item.CompletionTime
-            ? new Date(item.CompletionTime).toLocaleString()
-            : "N/A",
+          Initiated: item.CompletionTime || "N/A",
           InitialBalance: item.InitialBalance || 0,
           RewardPoints: item.Rewardpoints || 0,
           FinalBalance: item.FinalBalance || 0,
@@ -3571,9 +3564,7 @@ const downloadPlayerExcel = async () => {
         formattedData = allData.map((item, index) => ({
           SNo: index + 1,
           UserName: item.username || "N/A",
-          Initiated: item.claimedAt
-            ? new Date(item.claimedAt).toLocaleString()
-            : "N/A",
+          Initiated: item.claimedAt || "N/A",
           InitialBalance: item.initialBalance || 0,
           RewardAmount: item.rewardPoints || 0,
           FinalBalance: item.finalBalance || 0,
@@ -3583,10 +3574,14 @@ const downloadPlayerExcel = async () => {
         formattedData = allData.map((item, index) => ({
           SNo: index + 1,
           ReferringUserName: item.referringUser?.username || "N/A",
-          ReferredUserName: item.referredUser?.username || "N/A",
-          Initiated: item.createdAt
-            ? new Date(item.createdAt).toLocaleString()
+          ReferringUserId: item.referringUser?._id
+            ? `ObjectId("${item.referringUser._id}"),`
             : "N/A",
+          ReferredUserName: item.referredUser?.username || "N/A",
+          ReferredUserId: item.referredUser?._id
+            ? `ObjectId("${item.referredUser._id}"),`
+            : "N/A",
+          Initiated: item.createdAt || "N/A",
           InitialBalance: item.initialBalance || 0,
           ReferralAmount: item.referralamount || 0,
           FinalBalance: item.finalBalance || 0,
@@ -3595,9 +3590,7 @@ const downloadPlayerExcel = async () => {
         formattedData = allData.map((item, index) => ({
           SNo: index + 1,
           UserName: item.username || "N/A",
-          Initiated: item.createdAt
-            ? new Date(item.createdAt).toLocaleString()
-            : "N/A",
+          Initiated: item.createdAt || "N/A",
           WalletAddress: item.walletAddress || "N/A",
           Amount: item.withdrawalAmount || item.amount || 0,
           USDTAmount: item.USDT_Amount || 0,
@@ -3608,31 +3601,35 @@ const downloadPlayerExcel = async () => {
       // const ws = XLSX.utils.json_to_sheet(formattedData);
       // const wb = XLSX.utils.book_new();
 
-          const sheetName = historyType ? `${selectedUserId}_${historyType}` : `${selectedUserId}_history`;
+      const sheetName = historyType
+        ? `${selectedUserId}_${historyType}`
+        : `${selectedUserId}_history`;
 
-    // Ensure sheet name doesn't exceed 31 characters
-    const maxSheetNameLength = 31;
-    const truncatedSheetName = sheetName.length > maxSheetNameLength ? sheetName.substring(0, maxSheetNameLength) : sheetName;
+      // Ensure sheet name doesn't exceed 31 characters
+      const maxSheetNameLength = 31;
+      const truncatedSheetName =
+        sheetName.length > maxSheetNameLength
+          ? sheetName.substring(0, maxSheetNameLength)
+          : sheetName;
 
-    const ws = XLSX.utils.json_to_sheet(formattedData);
-    const wb = XLSX.utils.book_new();
+      const ws = XLSX.utils.json_to_sheet(formattedData);
+      const wb = XLSX.utils.book_new();
 
-    // Append sheet with the truncated name
-    XLSX.utils.book_append_sheet(wb, ws, truncatedSheetName);
+      // Append sheet with the truncated name
+      XLSX.utils.book_append_sheet(wb, ws, truncatedSheetName);
 
-    // Generate the file name
-    const fileName = `${selectedUserId}_${historyType || "all"}_${new Date().toISOString().split("T")[0]}.xlsx`;
-    XLSX.writeFile(wb, fileName);
+      // Generate the file name
+      const fileName = `${selectedUserId}_${historyType || "all"}_${new Date().toISOString().split("T")[0]}.xlsx`;
+      XLSX.writeFile(wb, fileName);
 
-    alert(`Successfully exported ${formattedData.length} records to Excel!`);
-  } catch (error) {
-    console.error("Error exporting to Excel:", error);
-    alert("Failed to export data. Please try again.");
-  } finally {
-    setIsExporting(false);
-  }
-};
-
+      alert(`Successfully exported ${formattedData.length} records to Excel!`);
+    } catch (error) {
+      console.error("Error exporting to Excel:", error);
+      alert("Failed to export data. Please try again.");
+    } finally {
+      setIsExporting(false);
+    }
+  };
 
   // Helper functions to extract data from different item types
   const getItemDescription = (item) => {
@@ -3708,10 +3705,10 @@ const downloadPlayerExcel = async () => {
   const renderTableHeaders = () => {
     if (!historyType || historyType === "") {
       return (
-       <tr>
+        <tr>
           <th>S.No</th>
           <th>User Name</th>
-          <th>Game Title</th>
+          {/* <th>Title</th> */}
           <th>Created At</th>
           <th>Initial Balance</th>
           <th>Bet Amount</th>
@@ -3720,7 +3717,6 @@ const downloadPlayerExcel = async () => {
           <th>Played Status</th>
           <th>History Type</th>
         </tr>
-
       );
     } else if (historyType === "gamehistory") {
       return (
@@ -3777,7 +3773,9 @@ const downloadPlayerExcel = async () => {
         <tr>
           <th>S.No</th>
           <th>Referring User Name</th>
+          <th>Referring UserId</th>
           <th>Referred User Name</th>
+          <th>Referred UserId</th>
           <th>Initiated</th>
           <th>Initial Balance</th>
           <th>Referral Amount</th>
@@ -3840,19 +3838,35 @@ const downloadPlayerExcel = async () => {
       if (!historyType || historyType === "") {
         // All types view - use getUserHistory format
         return (
-       <tr key={item._id || index} className="table-light">
+          <tr key={item._id || index} className="table-light">
             <td className="fw-bold">{serialNumber}</td>
             <td>{item.username || item.referringUser?.username || "N/A"}</td>
-            <td>{item.gameTitle || "N/A"}</td>
+            {/* <td>{item.type || "N/A"}</td> */}
             <td>{formattedDate}</td>
-            <td>{item.initialbalance || item.initialBalance || item.InitialBalance || 0}</td>
+            <td>
+              {item.initialbalance ||
+                item.initialBalance ||
+                item.InitialBalance ||
+                0}
+            </td>
             <td>{item.betAmount || 0}</td>
             <td>
-              {item.prize || item.winAmount || item.rewardPoints || item.Rewardpoints || item.referralamount || 0}
+              {item.prize ||
+                item.winAmount ||
+                item.rewardPoints ||
+                item.Rewardpoints ||
+                item.referralamount ||
+                0}
             </td>
-            <td>{item.finalbalance || item.finalBalance || item.FinalBalance || 0}</td>
             <td>
-              {item.playedstatus || item.playedStatus || item.status || (item.initiated ? "Completed" : "N/A") || "N/A"}
+              {item.finalbalance || item.finalBalance || item.FinalBalance || 0}
+            </td>
+            <td>
+              {item.playedstatus ||
+                item.playedStatus ||
+                item.status ||
+                (item.initiated ? "Completed" : "N/A") ||
+                "N/A"}
             </td>
             <td>
               <span
@@ -3876,7 +3890,6 @@ const downloadPlayerExcel = async () => {
               </span>
             </td>
           </tr>
-
         );
       } else if (historyType === "gamehistory") {
         return (
@@ -3884,16 +3897,8 @@ const downloadPlayerExcel = async () => {
             <td className="fw-bold">{serialNumber}</td>
             <td>{item.username || "N/A"}</td>
             <td>{item.gameTitle || "N/A"}</td>
-            <td>
-              {item.createdAt
-                ? new Date(item.createdAt).toLocaleString()
-                : "N/A"}
-            </td>
-            <td>
-              {item.updatedAt
-                ? new Date(item.updatedAt).toLocaleString()
-                : "N/A"}
-            </td>
+            <td>{item.createdAt|| "N/A"}</td>
+            <td>{item.updatedAt||"N/A"}</td>
             <td>{item.initialbalance || 0}</td>
             <td>{item.betAmount || 0}</td>
             <td>{item.winAmount || 0}</td>
@@ -3906,11 +3911,7 @@ const downloadPlayerExcel = async () => {
           <tr key={item._id || index} className="table-light">
             <td className="fw-bold">{serialNumber}</td>
             <td>{item.username || "N/A"}</td>
-            <td>
-              {item.CompletionTime
-                ? new Date(item.CompletionTime).toLocaleString()
-                : "N/A"}
-            </td>
+            <td>{item.CompletionTime || "N/A"}</td>
             <td>{item.InitialBalance || 0}</td>
             <td>{item.Rewardpoints || 0}</td>
             <td>{item.FinalBalance || 0}</td>
@@ -3937,11 +3938,7 @@ const downloadPlayerExcel = async () => {
           <tr key={item._id || index} className="table-light">
             <td className="fw-bold">{serialNumber}</td>
             <td>{item.username || "N/A"}</td>
-            <td>
-              {item.claimedAt
-                ? new Date(item.claimedAt).toLocaleString()
-                : "N/A"}
-            </td>
+            <td>{item.claimedAt||"N/A"}</td>
             <td>{item.initialBalance || 0}</td>
             <td>{item.rewardPoints || 0}</td>
             <td>{item.finalBalance || 0}</td>
@@ -3953,12 +3950,10 @@ const downloadPlayerExcel = async () => {
           <tr key={item._id || index} className="table-light">
             <td className="fw-bold">{serialNumber}</td>
             <td>{item.referringUser?.username || "N/A"}</td>
+            <td>{item.referringUser?._id || "N/A"}</td>
             <td>{item.referredUser?.username || "N/A"}</td>
-            <td>
-              {item.createdAt
-                ? new Date(item.createdAt).toLocaleString()
-                : "N/A"}
-            </td>
+            <td>{item.referredUser?._id || "N/A"}</td>
+            <td>{item.createdAt||"N/A"}</td>
             <td>{item.initialBalance || 0}</td>
             <td>{item.referralamount || 0}</td>
             <td>{item.finalBalance || 0}</td>
@@ -3968,10 +3963,6 @@ const downloadPlayerExcel = async () => {
         return (
           <tr key={item._id || index} className="table-light">
             <td className="fw-bold">{serialNumber}</td>
-            <td>{item.username || "N/A"}</td>
-            <td>{formattedDate}</td>
-            <td>{item.walletAddress || "N/A"}</td>
-            <td>{item.withdrawalAmount || item.amount || 0}</td>
             <td>{item.username || "N/A"}</td>
             <td>{formattedDate}</td>
             <td>{item.walletAddress || "N/A"}</td>
@@ -4296,8 +4287,7 @@ const downloadPlayerExcel = async () => {
                       </div>
                       <h6 className="text-muted mb-2">Withdrawals</h6>
                       <h3 className="mb-0 fw-bold" style={{ color: "#28a745" }}>
-                        {userStats.totalWithdAmount?.toLocaleString() ||
-                          "0"}
+                        {userStats.totalWithdAmount?.toLocaleString() || "0"}
                       </h3>
                       <small className="text-muted">
                         USDT: {userStats.totalTUSDT_AMOUNT || 0}

@@ -402,7 +402,7 @@ const RejectedWithdrawals = () => {
           UserId: withdrawal.userId || "N/A",
           UserName: withdrawal.username || "N/A",
           Network: withdrawal.token || "N/A",
-          Initiated: withdrawal.createdAt ? new Date(withdrawal.createdAt).toLocaleString() : "N/A",
+          Initiated: withdrawal.createdAt || "N/A",
           Amount: withdrawal.amount || 0,
           Charge: withdrawal.charge || 0,
           USDT_Amount: withdrawal.USDT_Amount || 0,
@@ -495,7 +495,7 @@ const RejectedWithdrawals = () => {
                         </td>
                         <td>{withdrawal.username || "N/A"}</td>
                         <td>{withdrawal.token || "N/A"}</td>
-                        <td>{new Date(withdrawal.createdAt).toLocaleString() || "N/A"}</td>
+                        <td>{withdrawal.createdAt || "N/A"}</td>
                         <td>{withdrawal.amount || 0}</td>
                         <td>{withdrawal.charge || 0}</td>
                         <td>{withdrawal.USDT_Amount || 0}</td>

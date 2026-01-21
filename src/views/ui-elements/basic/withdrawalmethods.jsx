@@ -246,9 +246,7 @@ const WithdrawalMethods = () => {
                         </td>
                         <td className="fw-bold">{method.Symbol || "N/A"}</td>
                         <td>
-                          {method.createdAt
-                            ? new Date(method.createdAt).toLocaleString()
-                            : "N/A"}
+                          {method.createdAt|| "N/A"}
                         </td>
                         <td>{method.minWithdrawal ?? 0}</td>
                         <td>{method.maxWithdrawal ?? 0}</td>

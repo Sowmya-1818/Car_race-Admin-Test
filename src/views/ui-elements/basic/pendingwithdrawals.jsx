@@ -427,7 +427,6 @@
 // export default PendingWithdrawals
 
 
-
 "use client"
 
 import { useState, useEffect } from "react"
@@ -589,7 +588,7 @@ const PendingWithdrawals = () => {
         UserId: withdrawal.userId || "N/A",
         UserName: withdrawal.username || "N/A",
         Network: withdrawal.token || "N/A",
-        Initiated: withdrawal.createdAt ? new Date(withdrawal.createdAt).toLocaleString() : "N/A",
+        Initiated: withdrawal.createdAt || "N/A",
         Amount: withdrawal.amount || 0,
         Charge: withdrawal.charge || 0,
         USDT_Amount: withdrawal.USDT_Amount || 0,
@@ -674,7 +673,7 @@ const PendingWithdrawals = () => {
                           </td>
                           <td>{withdrawal.username || "N/A"}</td>
                           <td>{withdrawal.token || "N/A"}</td>
-                          <td>{new Date(withdrawal.createdAt).toLocaleString() || "N/A"}</td>
+                          <td>{withdrawal.createdAt|| "N/A"}</td>
                           <td>{withdrawal.amount || 0}</td>
                           <td>{withdrawal.charge || 0}</td>
                           <td>{withdrawal.USDT_Amount || 0}</td>
@@ -713,29 +712,56 @@ const PendingWithdrawals = () => {
               </div>
 
               {/* Pagination - Same structure as other pages */}
-              <div className="d-flex justify-content-center mt-3">
-                <nav aria-label="Page navigation">
-                  <div className="d-flex align-items-center gap-1 p-2 bg-white rounded shadow-sm border">
-                    <button
-                      className={`btn d-flex align-items-center justify-content-center ${
-                        currentPage === 1 ? "text-muted border-0 bg-light" : "text-white border-0"
-                      }`}
-                      style={{
-                        width: "40px",
-                        height: "40px",
-                        backgroundColor: currentPage === 1 ? "#f8f9fa" : "#00BFFF",
-                        cursor: currentPage === 1 ? "not-allowed" : "pointer",
-                      }}
-                      disabled={currentPage === 1}
-                      onClick={prevPage}
-                    >
-                      &#8249;
-                    </button>
+         <div className="d-flex justify-content-center mt-3">
+              <nav aria-label="Page navigation">
+                <div className="d-flex align-items-center gap-1 p-2 bg-white rounded shadow-sm border">
+                  {/* Previous Button */}
+                  <button
+                    className={`btn d-flex align-items-center justify-content-center ${
+                      currentPage === 1 ? "text-muted border-0 bg-light" : "text-white border-0"
+                    }`}
+                    style={{
+                      width: "40px",
+                      height: "40px",
+                      backgroundColor: currentPage === 1 ? "#f8f9fa" : "#00BFFF",
+                      cursor: currentPage === 1 ? "not-allowed" : "pointer",
+                    }}
+                    disabled={currentPage === 1}
+                    onClick={prevPage}
+                  >
+                    &#8249;
+                  </button>
 
-                    {(() => {
-                      const pages = []
-                      if (totalPages <= 7) {
-                        for (let i = 1; i <= totalPages; i++) {
+                  {/* Page Numbers */}
+                  {(() => {
+                    const pages = []
+
+                    if (totalPages <= 7) {
+                      // Show all pages if 7 or fewer
+                      for (let i = 1; i <= totalPages; i++) {
+                        pages.push(
+                          <button
+                            key={i}
+                            className={`btn d-flex align-items-center justify-content-center border-0 ${
+                              currentPage === i ? "text-white" : "text-dark bg-light hover-bg-gray"
+                            }`}
+                            style={{
+                              width: "40px",
+                              height: "40px",
+                              backgroundColor: currentPage === i ? "#00BFFF" : "#f8f9fa",
+                              fontWeight: currentPage === i ? "bold" : "normal",
+                            }}
+                            onClick={() => goToPage(i)}
+                          >
+                            {i}
+                          </button>,
+                        )
+                      }
+                    } else {
+                      // Complex pagination logic for many pages
+                      if (currentPage <= 3) {
+                        // Show first 3 pages, ellipsis, last page
+                        for (let i = 1; i <= 3; i++) {
                           pages.push(
                             <button
                               key={i}
@@ -754,28 +780,138 @@ const PendingWithdrawals = () => {
                             </button>,
                           )
                         }
+                        if (totalPages > 4) {
+                          pages.push(
+                            <span key="ellipsis1" className="d-flex align-items-center px-2 text-muted">
+                              ...
+                            </span>,
+                          )
+                          pages.push(
+                            <button
+                              key={totalPages}
+                              className="btn d-flex align-items-center justify-content-center border-0 text-dark bg-light hover-bg-gray"
+                              style={{ width: "40px", height: "40px" }}
+                              onClick={() => goToPage(totalPages)}
+                            >
+                              {totalPages}
+                            </button>,
+                          )
+                        }
+                      } else if (currentPage >= totalPages - 2) {
+                        // Show first page, ellipsis, last 3 pages
+                        pages.push(
+                          <button
+                            key={1}
+                            className="btn d-flex align-items-center justify-content-center border-0 text-dark bg-light hover-bg-gray"
+                            style={{ width: "40px", height: "40px" }}
+                            onClick={() => goToPage(1)}
+                          >
+                            1
+                          </button>,
+                        )
+                        pages.push(
+                          <span key="ellipsis2" className="d-flex align-items-center px-2 text-muted">
+                            ...
+                          </span>,
+                        )
+                        for (let i = totalPages - 2; i <= totalPages; i++) {
+                          pages.push(
+                            <button
+                              key={i}
+                              className={`btn d-flex align-items-center justify-content-center border-0 ${
+                                currentPage === i ? "text-white" : "text-dark bg-light hover-bg-gray"
+                              }`}
+                              style={{
+                                width: "40px",
+                                height: "40px",
+                                backgroundColor: currentPage === i ? "#00BFFF" : "#f8f9fa",
+                                fontWeight: currentPage === i ? "bold" : "normal",
+                              }}
+                              onClick={() => goToPage(i)}
+                            >
+                              {i}
+                            </button>,
+                          )
+                        }
+                      } else {
+                        // Show first page, ellipsis, current-1, current, current+1, ellipsis, last page
+                        pages.push(
+                          <button
+                            key={1}
+                            className="btn d-flex align-items-center justify-content-center border-0 text-dark bg-light hover-bg-gray"
+                            style={{
+                              width: "40px",
+                              height: "40px",
+                            }}
+                            onClick={() => goToPage(1)}
+                          >
+                            1
+                          </button>,
+                        )
+                        pages.push(
+                          <span key="ellipsis3" className="d-flex align-items-center px-2 text-muted">
+                            ...
+                          </span>,
+                        )
+                        for (let i = currentPage - 1; i <= currentPage + 1; i++) {
+                          pages.push(
+                            <button
+                              key={i}
+                              className={`btn d-flex align-items-center justify-content-center border-0 ${
+                                currentPage === i ? "text-white" : "text-dark bg-light hover-bg-gray"
+                              }`}
+                              style={{
+                                width: "40px",
+                                height: "40px",
+                                backgroundColor: currentPage === i ? "#00BFFF" : "#f8f9fa",
+                                fontWeight: currentPage === i ? "bold" : "normal",
+                              }}
+                              onClick={() => goToPage(i)}
+                            >
+                              {i}
+                            </button>,
+                          )
+                        }
+                        pages.push(
+                          <span key="ellipsis4" className="d-flex align-items-center px-2 text-muted">
+                            ...
+                          </span>,
+                        )
+                        pages.push(
+                          <button
+                            key={totalPages}
+                            className="btn d-flex align-items-center justify-content-center border-0 text-dark bg-light hover-bg-gray"
+                            style={{ width: "40px", height: "40px" }}
+                            onClick={() => goToPage(totalPages)}
+                          >
+                            {totalPages}
+                          </button>,
+                        )
                       }
-                      return pages
-                    })()}
+                    }
 
-                    <button
-                      className={`btn d-flex align-items-center justify-content-center ${
-                        currentPage >= totalPages ? "text-muted border-0 bg-light" : "text-white border-0"
-                      }`}
-                      style={{
-                        width: "40px",
-                        height: "40px",
-                        backgroundColor: currentPage >= totalPages ? "#f8f9fa" : "#00BFFF",
-                        cursor: currentPage >= totalPages ? "not-allowed" : "pointer",
-                      }}
-                      disabled={currentPage >= totalPages}
-                      onClick={nextPage}
-                    >
-                      &#8250;
-                    </button>
-                  </div>
-                </nav>
-              </div>
+                    return pages
+                  })()}
+
+                  {/* Next Button */}
+                  <button
+                    className={`btn d-flex align-items-center justify-content-center ${
+                      currentPage >= totalPages ? "text-muted border-0 bg-light" : "text-white border-0"
+                    }`}
+                    style={{
+                      width: "40px",
+                      height: "40px",
+                      backgroundColor: currentPage >= totalPages ? "#f8f9fa" : "#00BFFF",
+                      cursor: currentPage >= totalPages ? "not-allowed" : "pointer",
+                    }}
+                    disabled={currentPage >= totalPages}
+                    onClick={nextPage}
+                  >
+                    &#8250;
+                  </button>
+                </div>
+              </nav>
+            </div>
             </div>
           </CRow>
         </CCardBody>
